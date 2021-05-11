@@ -10,14 +10,31 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="13ed6724-5cff-47df-a9fd-9d981c1ac6e3" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/src/main/java/cse/maven_webmail/control/AddrBean.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/cse/maven_webmail/control/AddrBook.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/webapp/addrbook_control.jsp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/webapp/addrbook_edit_form.jsp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/webapp/addrbook_error.jsp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/webapp/addrbook_list.jsp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/webapp/addrbook_modify.jsp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/webapp/css/addbook.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/webapp/admin_menu.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/admin_menu.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/webapp/index.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/index.jsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cse/maven_webmail/model/UserAdminAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cse/maven_webmail/model/UserAdminAgent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/maven_webmail-1.0-SNAPSHOT/META-INF/MANIFEST.MF" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven_webmail-1.0-SNAPSHOT/META-INF/MANIFEST.MF" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="CSS File" />
+        <option value="Jsp File" />
+        <option value="Class" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -41,12 +58,30 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="list.type.of.created.stylesheet" value="CSS" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
   </component>
   <component name="RunManager">
-    <configuration name="Tomcat 9.0.43" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" APPLICATION_SERVER_NAME="Tomcat 9.0.43" ALTERNATIVE_JRE_ENABLED="false" nameIsGenerated="true">
+    <configuration default="true" type="ArquillianTestNG" factoryName="" nameIsGenerated="true">
+      <option name="arquillianRunConfiguration">
+        <value>
+          <option name="containerStateName" value="" />
+        </value>
+      </option>
+      <option name="TEST_OBJECT" value="CLASS" />
+      <properties />
+      <listeners />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Tomcat 10" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" APPLICATION_SERVER_NAME="Tomcat 10.0.5" ALTERNATIVE_JRE_ENABLED="true" ALTERNATIVE_JRE_PATH="11">
       <option name="BROWSER_ID" value="e5120d43-2c3f-47ef-9f26-65e539e05186" />
       <option name="UPDATING_POLICY" value="restart-server" />
       <deployment>
@@ -225,6 +260,10 @@
       <workItem from="1619880515088" duration="124000" />
       <workItem from="1620205364753" duration="4216000" />
       <workItem from="1620650794176" duration="4182000" />
+      <workItem from="1620656447826" duration="1848000" />
+      <workItem from="1620728804581" duration="2267000" />
+      <workItem from="1620735015557" duration="5586000" />
+      <workItem from="1620745667782" duration="4283000" />
     </task>
     <servers />
   </component>
