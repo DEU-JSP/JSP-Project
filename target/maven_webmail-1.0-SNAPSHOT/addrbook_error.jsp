@@ -10,6 +10,8 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <HTML>
 <body>
+    <link type="text/css" rel="stylesheet" href="css/main_style.css" />
+
 <div align="center">
     <H2>주소록 에러</H2>
     <HR>
@@ -18,6 +20,7 @@
             주소록 처리중 에러가 발생 했습니다.<BR>
             관리자에게 문의해 주세요..<BR>
             빠른시일내 복구하겠습니다.
+            문의사항이생기시면<a>kanghodong@kakao.com</a>
             <HR>
             에러내용 : <%= exception%>
             <HR>

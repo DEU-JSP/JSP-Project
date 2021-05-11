@@ -6,13 +6,13 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page language="java" contentType="text/html; charset=utf-8"
-         pageEncoding="utf-8"  errorPage="addrbook_error.jsp" import="cse.maven_webmail.*, java.util.*"%>
+         pageEncoding="utf-8"  errorPage="addrbook_error.jsp" import ="cse.maven_webmail.*, java.util.*"%>
 <%@ page import="cse.maven_webmail.control.AddrBook" %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <% request.setCharacterEncoding("utf-8"); %>
 
 <jsp:useBean id="ab" scope="page" class="cse.maven_webmail.control.AddrBean"/>
-<jsp:useBean id="addrbook" class="cse.maven_webmail.control.AddrBean"/>
+<jsp:useBean id="addrbook" class="cse.maven_webmail.control.AddrBook"/>
 <jsp:setProperty name="addrbook" property="*"/>
 <%
     // 컨트롤러 요청 파라미터

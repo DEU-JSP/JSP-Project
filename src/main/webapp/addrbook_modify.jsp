@@ -10,8 +10,7 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-    <link rel="stylesheet" href="addrbook.css" type="text/css" media="screen" />
-
+    <link type="text/css" rel="stylesheet" href="css/main_style.css" />
     <script type="text/javascript">
         function delcheck() {
             result = confirm("정말로 삭제하시겠습니까 ?");

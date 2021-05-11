@@ -16,14 +16,14 @@ public class AddrBean {
 
     /* MySQL 연결정보 */
     String jdbc_driver = "com.mysql.jdbc.Driver";
-    String jdbc_url = "jdbc:mysql://localhost:3308/hjh-mysql";
+    String jdbc_url = "jdbc:mysql://localhost:3308:3306/hjh-mysql";
 
     // DB연결 메서드
     void connect() {
         try {
             Class.forName(jdbc_driver);
 
-            conn = DriverManager.getConnection(jdbc_url,"jspbook","1234");
+            conn = DriverManager.getConnection(jdbc_url,"jdbctester","1234");
         } catch (Exception e) {
             e.printStackTrace();
         }
