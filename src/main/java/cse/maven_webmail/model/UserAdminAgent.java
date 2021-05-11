@@ -29,7 +29,7 @@ public class UserAdminAgent {
     private String ROOT_ID;  //  = "root";
     private String ROOT_PASSWORD;  // = "root";
     private String ADMIN_ID; //  = "admin";
-    private final String EOL = "\r\n";
+    private final String EOL = "\r";
     String cwd;
 
     public UserAdminAgent(String server, int port, String cwd) throws Exception {

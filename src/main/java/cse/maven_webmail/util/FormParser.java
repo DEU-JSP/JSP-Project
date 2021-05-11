@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package cse.maven_webmail.model;
+package cse.maven_webmail.util;
 
 import java.io.File;
 import java.util.Iterator;

@@ -10,14 +10,34 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="13ed6724-5cff-47df-a9fd-9d981c1ac6e3" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/webapp/admin_menu.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/admin_menu.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/webapp/index.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/index.jsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maven_webmail.iml" beforeDir="false" afterPath="$PROJECT_DIR$/maven_webmail.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cse/maven_webmail/control/TrashCanHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cse/maven_webmail/control/TrashCanHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cse/maven_webmail/control/TrashCanHandlerImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cse/maven_webmail/control/TrashCanHandlerImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cse/maven_webmail/control/WriteMailHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cse/maven_webmail/control/WriteMailHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cse/maven_webmail/model/Message.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cse/maven_webmail/model/Message.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cse/maven_webmail/model/Pop3Agent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cse/maven_webmail/model/Pop3Agent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cse/maven_webmail/model/UserAdminAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cse/maven_webmail/model/UserAdminAgent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cse/maven_webmail/util/FormParser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cse/maven_webmail/util/FormParser.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cse/maven_webmail/util/MessageFormatter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cse/maven_webmail/util/MessageFormatter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cse/maven_webmail/util/MessageParser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cse/maven_webmail/util/MessageParser.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/web.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/web.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/maven_webmail-1.0-SNAPSHOT/WEB-INF/web.xml" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven_webmail-1.0-SNAPSHOT/WEB-INF/web.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Interface" />
+        <option value="Class" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -38,14 +58,27 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="nodejs_package_manager_path" value="npm" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
   </component>
   <component name="RunManager">
+    <configuration default="true" type="ArquillianJUnit" factoryName="" nameIsGenerated="true">
+      <option name="arquillianRunConfiguration">
+        <value>
+          <option name="containerStateName" value="" />
+        </value>
+      </option>
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="Tomcat 9.0.43" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" APPLICATION_SERVER_NAME="Tomcat 9.0.43" ALTERNATIVE_JRE_ENABLED="false" nameIsGenerated="true">
       <option name="BROWSER_ID" value="e5120d43-2c3f-47ef-9f26-65e539e05186" />
       <option name="UPDATING_POLICY" value="restart-server" />
@@ -224,7 +257,7 @@
       <workItem from="1619748821810" duration="62000" />
       <workItem from="1619880515088" duration="124000" />
       <workItem from="1620205364753" duration="4216000" />
-      <workItem from="1620650794176" duration="4182000" />
+      <workItem from="1620650794176" duration="20531000" />
     </task>
     <servers />
   </component>

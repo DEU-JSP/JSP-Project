@@ -2,7 +2,7 @@
  * File: MessageParser.java
  * Goal: 메일 메시지의 정보 추출(To, Cc, From, Subject, Body, Attached File)
  */
-package cse.maven_webmail.model;
+package cse.maven_webmail.util;
 
 import java.io.File;
 import java.io.FileOutputStream;

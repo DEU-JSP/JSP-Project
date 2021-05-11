@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package cse.maven_webmail.model;
+package cse.maven_webmail.util;
 
 import cse.maven_webmail.control.CommandType;
 import javax.mail.Message;

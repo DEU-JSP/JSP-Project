@@ -3,7 +3,7 @@
     <context-param>
         <description>Relative URL for the WebMail System</description>
         <param-name>HomeDirectory</param-name>
-        <param-value>/maven_webmail/</param-value>
+        <param-value>/maven_webmail_war/</param-value>
     </context-param>
     <context-param>
         <description>SMTP/POP3 서버의 IP 주소 또는 호스트 이름</description>

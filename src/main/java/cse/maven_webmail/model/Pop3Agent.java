@@ -5,13 +5,15 @@
  */
 package cse.maven_webmail.model;
 
+import cse.maven_webmail.util.MessageFormatter;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
-import javax.mail.FetchProfile;
-import javax.mail.Flags;
-import javax.mail.Folder;
+import java.util.concurrent.atomic.AtomicBoolean;
+import javax.mail.*;
 import javax.mail.Message;
-import javax.mail.Session;
-import javax.mail.Store;
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -50,6 +52,47 @@ public class Pop3Agent {
         }
     }
 
+    public boolean moveToTrashCan(List<Optional<cse.maven_webmail.model.Message>> msgList) {
+        AtomicBoolean status = new AtomicBoolean(false);
+
+        if (!connectToStore())
+            return status.get();
+
+        try {
+            // Folder 설정
+//            Folder folder = store.getDefaultFolder();
+            Folder readFolder = store.getFolder("INBOX");
+            Folder trashFolder = store.getFolder("TRASHCAN");
+            readFolder.open(Folder.READ_WRITE);
+            trashFolder.open(Folder.READ_WRITE);
+
+            List<Optional<Message>> msgs = new ArrayList<>();
+            msgList.forEach((m) -> {
+                try {
+                    msgs.add(Optional.of(readFolder.getMessage(m.get().getMsgId())));
+                } catch (MessagingException e) {
+                    e.printStackTrace();
+                    status.set(false);
+                }
+            });
+            readFolder.copyMessages(msgs.stream().map(Optional::get).toArray(Message[]::new),trashFolder);
+            trashFolder.close();
+            msgs.forEach(m-> {
+                try {
+                    m.get().setFlag(Flags.Flag.DELETED, true);
+                } catch (MessagingException e) {
+                    e.printStackTrace();
+                }
+            });
+            readFolder.close(true);  // expunge == true
+            store.close();
+            status.set(true);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return status.get();
+    }
     public boolean deleteMessage(int msgid, boolean really_delete) {
         boolean status = false;
 
