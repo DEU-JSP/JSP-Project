@@ -50,6 +50,7 @@ public class LoginHandler extends HttpServlet {
                     Pop3Agent pop3Agent = new Pop3Agent(host, userid, password);
                     boolean isLoginSuccess = pop3Agent.validate();
 
+                    //boolean isLoginSuccess = true;
                     // Now call the correct page according to its validation result.
                     if (isLoginSuccess) {
                         if (isAdmin(userid)) {
