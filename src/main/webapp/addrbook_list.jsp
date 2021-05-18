@@ -71,6 +71,8 @@
             </tr>
 
         </table>
+        <br>
+        <a href="main_menu.jsp">이전 메뉴로</a><P>
     </form>
 
 </div>

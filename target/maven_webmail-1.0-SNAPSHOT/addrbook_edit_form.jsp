@@ -21,7 +21,7 @@
 <div align="center">
     <H2>주소록:작성화면 </H2>
     <HR>
-    [<a href=addrbook_control.jsp?action=list>주소록 목록으로</a>] <P>
+    [<a href=addrbook_list.jsp?action=list>주소록 목록으로</a>] <P>
     <form name=form1 method=post action=addrbook_control.jsp> <%--폼의 action은 컨트롤러로 설정 --%>
         <input type=hidden name="ab_id" value="<%=ab.getAb_id()%>">
         <input type=hidden name="action" value="update">
