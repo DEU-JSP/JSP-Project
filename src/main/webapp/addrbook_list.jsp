@@ -14,14 +14,14 @@
 
     <%--스타일 시트 적용 부분 /addrbook.css 파일을 불러와 스타일 적용 --%>
     <link type="text/css" rel="stylesheet" href="css/main_style.css" />
-
+    <!--
     <script type="text/javascript">
         function check(ab_id) {
             pwd = prompt('수정/삭제 하려면 비밀번호를 넣으세요');
             document.location.href="addrbook_control.jsp?action=edit&ab_id="+ab_id+"&upasswd="+pwd;
         }
     </script>
-
+    -->
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>주소록:목록화면</title>
 
@@ -42,8 +42,8 @@
             %>
               <tr>
                <td><a href="javascript:check(<%=ab.getAb_id()%>)"><%=ab.getAb_id() %></a></td>
-                <td><%=ab.getAb_tel() %></td>
                 <td><%=ab.getAb_name() %></td>
+                <td><%=ab.getAb_tel() %></td>
                 <td><%=ab.getAb_birth() %></td>
                 <td><%=ab.getAb_comdept() %></td>
                 <td><%=ab.getAb_memo() %></td>
@@ -53,6 +53,7 @@
              %>
 
             <%-- 화면구조확인 위해 --%>
+        <!--
             <tr>
                 <td>
                     <%--주소록 번호 클릭시 수정화면으로 이동 / 추후 자바스크립트를 통해 비밀번호 입력 후 컨트롤러로 연결하도록 수정 --%>
@@ -69,7 +70,7 @@
                 <td>3</a></td><td>전규빈</td><td>010-2222-2222</td><td>1997-09-30</td>
                 <td>동의대학교</td><td>ICT융합대학</td>
             </tr>
-
+        -->
         </table>
         <br>
         <a href="main_menu.jsp">이전 메뉴로</a><P>

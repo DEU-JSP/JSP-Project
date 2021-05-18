@@ -6,8 +6,9 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page language="java" contentType="text/html; charset=utf-8"
-         pageEncoding="utf-8"  errorPage="addrbook_error.jsp" import ="cse.maven_webmail.*, java.util.*"%>
+         pageEncoding="utf-8" errorPage="addrbook_error.jsp" import ="cse.maven_webmail.*, java.util.*"%>
 <%@ page import="cse.maven_webmail.control.AddrBook" %>
+<%--<%@ page import="cse.maven_webmail.control.AddrBook" %>--%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <% request.setCharacterEncoding("utf-8"); %>
 
@@ -25,7 +26,7 @@
 
 		 ArrayList<AddrBook> datas = ab.getDBList();
 		request.setAttribute("datas", datas);
-		pageContext.forward("addrbook_list2.jsp");
+		pageContext.forward("addrbook_list.jsp");
 
     }
     // 주소록 등록 요청인 경우
