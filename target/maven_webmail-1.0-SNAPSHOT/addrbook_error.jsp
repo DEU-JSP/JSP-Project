@@ -20,7 +20,7 @@
             주소록 처리중 에러가 발생 했습니다.<BR>
             관리자에게 문의해 주세요..<BR>
             빠른시일내 복구하겠습니다.
-            문의사항이생기시면<a>kanghodong@kakao.com</a>
+            문의사항이생기시면<a>hwangjeongho@kakao.com</a>
             <HR>
             에러내용 : <%= exception%>
             <HR>

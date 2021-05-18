@@ -63,21 +63,9 @@
                 <td><input type="text" name="ab_memo" value="<%--<%=ab.getAb_memo() %>--%>" ></td>
             </tr>
             <tr>
-                <td colspan=2 align=center><input type=submit value="저장"><input type=reset value="취소"><input type="button" value="삭제" onClick="delcheck()"></td>
+                <td colspan=2 align=center><input type=submit value="저장"><input type=reset href="addrbook_control.jsp?action=list" value="취소"><input type="button" value="삭제" onClick="delcheck()"></td>
             </tr>
         </table>
-    <script type="text/javascript">
-        function delcheck() {
-            result = confirm("정말로 삭제하시겠습니까 ?");
-
-            if(result == true){
-                document.form1.action.value="delete";
-                document.form1.submit();
-            }
-            else
-                return;
-        }
-    </script>
     </form>
 
 </div>
