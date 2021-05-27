@@ -6,7 +6,10 @@
 package cse.maven_webmail.model;
 
 import cse.maven_webmail.util.MessageFormatter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -14,6 +17,7 @@ import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.mail.*;
 import javax.mail.Message;
+import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -21,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
  * @author jongmin
  */
 public class Pop3Agent {
+    private static final Logger logger = LoggerFactory.getLogger(Pop3Agent.class);
 
     private String host;
     private String userid;
@@ -28,6 +33,10 @@ public class Pop3Agent {
     private Store store;
     private String exceptionType;
     private HttpServletRequest request;
+    final String JdbcDriver = "com.mysql.cj.jdbc.Driver";
+    final String JdbcUrl = "jdbc:mysql://localhost:3308/webmail?serverTimezone=Asia/Seoul";
+    final String User = "root";
+    final String Password = "1234";
 
     public Pop3Agent() {
     }
@@ -52,76 +61,6 @@ public class Pop3Agent {
         }
     }
 
-    public boolean moveToTrashCan(List<Optional<cse.maven_webmail.model.Message>> msgList) {
-        AtomicBoolean status = new AtomicBoolean(false);
-
-        if (!connectToStore())
-            return status.get();
-
-        try {
-            // Folder 설정
-//            Folder folder = store.getDefaultFolder();
-            Folder readFolder = store.getFolder("INBOX");
-            Folder trashFolder = store.getFolder("TRASHCAN");
-            readFolder.open(Folder.READ_WRITE);
-            trashFolder.open(Folder.READ_WRITE);
-
-            List<Optional<Message>> msgs = new ArrayList<>();
-            msgList.forEach((m) -> {
-                try {
-                    msgs.add(Optional.of(readFolder.getMessage(m.get().getMsgId())));
-                } catch (MessagingException e) {
-                    e.printStackTrace();
-                    status.set(false);
-                }
-            });
-            readFolder.copyMessages(msgs.stream().map(Optional::get).toArray(Message[]::new),trashFolder);
-            trashFolder.close();
-            msgs.forEach(m-> {
-                try {
-                    m.get().setFlag(Flags.Flag.DELETED, true);
-                } catch (MessagingException e) {
-                    e.printStackTrace();
-                }
-            });
-            readFolder.close(true);  // expunge == true
-            store.close();
-            status.set(true);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return status.get();
-    }
-    public boolean deleteMessage(int msgid, boolean really_delete) {
-        boolean status = false;
-
-        if (!connectToStore()) {
-            return status;
-        }
-
-        try {
-            // Folder 설정
-//            Folder folder = store.getDefaultFolder();
-            Folder folder = store.getFolder("INBOX");
-            folder.open(Folder.READ_WRITE);
-
-            // Message에 DELETED flag 설정
-            Message msg = folder.getMessage(msgid);
-            msg.setFlag(Flags.Flag.DELETED, really_delete);
-
-            // 폴더에서 메시지 삭제
-            // Message [] expungedMessage = folder.expunge();
-            // <-- 현재 지원 안 되고 있음. 폴더를 close()할 때 expunge해야 함.
-            folder.close(true);  // expunge == true
-            store.close();
-            status = true;
-        } catch (Exception ex) {
-            System.out.println("deleteMessage() error: " + ex);
-        } finally {
-            return status;
-        }
-    }
 
     /*
      * 페이지 단위로 메일 목록을 보여주어야 함.
@@ -150,6 +89,45 @@ public class Pop3Agent {
             MessageFormatter formatter = new MessageFormatter(userid);  //3.5
             result = formatter.getMessageTable(messages);   // 3.6
 
+            folder.close(false);  // 3.7
+            store.close();       // 3.8
+        } catch (Exception ex) {
+            System.out.println("Pop3Agent.getMessageList() : exception = " + ex);
+            result = "Pop3Agent.getMessageList() : exception = " + ex;
+        } finally {
+            return result;
+        }
+    }
+
+    public String getTrashList() {
+        String result = "";
+        Message[] messages = null;
+        List<Message> filter_message = new ArrayList<>();
+
+        if (!connectToStore()) {  // 3.1
+            System.err.println("POP3 connection failed!");
+            return "POP3 연결이 되지 않아 메일 목록을 볼 수 없습니다.";
+        }
+
+        try {
+            // 메일 폴더 열기
+            Folder folder = store.getFolder("INBOX");  // 3.2
+            folder.open(Folder.READ_ONLY);  // 3.3
+
+            // 현재 수신한 메시지 모두 가져오기
+            messages = folder.getMessages();      // 3.4
+            for (Message value : messages) {
+                if (value.isSet(Flags.Flag.DELETED))
+                    filter_message.add(value);
+
+            }
+            FetchProfile fp = new FetchProfile();
+            // From, To, Cc, Bcc, ReplyTo, Subject & Date
+            fp.add(FetchProfile.Item.ENVELOPE);
+            folder.fetch(messages, fp);
+
+            MessageFormatter formatter = new MessageFormatter(userid);  //3.5
+            result = formatter.getMessageTable(filter_message.toArray(new Message[filter_message.size()]));   // 3.6
             folder.close(true);  // 3.7
             store.close();       // 3.8
         } catch (Exception ex) {
@@ -160,6 +138,89 @@ public class Pop3Agent {
         }
     }
 
+    public boolean deleteMessage(int msgid) {
+        Connection connection;
+        PreparedStatement preparedStatement = null;
+        String sql = "SELECT num,message_name FROM(SELECT @num:=@num+1 AS num, message_name FROM (SELECT @num:=0) AS n, inbox WHERE repository_name = ?)a WHERE a.num = ?";
+        String sql2 = "INSERT INTO trash SELECT * FROM inbox where message_name = ?";
+        String messageName = "";
+        if (!connectToStore()) {
+            return false;
+        }
+
+        try {
+            connection = getConnection();
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, userid);
+            preparedStatement.setInt(2, msgid);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            resultSet.next();
+            messageName = resultSet.getString(2);
+            System.out.println("messageName"+messageName);
+            preparedStatement.close();
+            preparedStatement = connection.prepareStatement(sql2);
+            preparedStatement.setString(1,messageName);
+            preparedStatement.executeUpdate();
+            preparedStatement.close();
+            connection.close();
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
+        boolean status = false;
+        logger.info("deleteMessage 값 : {}", msgid);
+
+        try {
+            // Folder 설정
+            Folder folder = store.getFolder("INBOX");
+            folder.open(Folder.READ_WRITE);
+            // Message에 DELETED flag 설정
+            Message msg = folder.getMessage(msgid);
+            logger.info("message number : {}", msg.getMessageNumber());
+            logger.info("{}", msg.getSubject());
+            msg.setFlag(Flags.Flag.DELETED, true);
+
+            // 폴더에서 메시지 삭제
+            // <-- 현재 지원 안 되고 있음. 폴더를 close()할 때 expunge해야 함.
+            folder.close(true);  // expunge == true
+            store.close();
+            status = true;
+        } catch (Exception ex) {
+            logger.error("deleteMessage() error: {}", ex.getMessage());
+        }
+        return status;
+    }
+
+//    public boolean deleteMessage(int msgid, boolean reallyDelete) {
+//        boolean status = false;
+//        logger.info("deleteMessage 값 : {}", msgid);
+//
+//        if (!connectToStore()) {
+//            return false;
+//        }
+//
+//        try {
+//            // Folder 설정
+//            Folder folder = store.getFolder("INBOX");
+//            folder.open(Folder.READ_WRITE);
+//            // Message에 DELETED flag 설정
+//            Message msg = folder.getMessage(msgid);
+//            logger.info("message number : {}", msg.getMessageNumber());
+//            logger.info("{}", msg.getSubject());
+//            msg.setFlag(Flags.Flag.DELETED, reallyDelete);
+//
+//            // 폴더에서 메시지 삭제
+//            // <-- 현재 지원 안 되고 있음. 폴더를 close()할 때 expunge해야 함.
+//            folder.close(true);  // expunge == true
+//            store.close();
+//            status = true;
+//        } catch (Exception ex) {
+//            logger.error("deleteMessage() error: {}", ex.getMessage());
+//        }
+//        return status;
+//
+//    }
     public String getMessage(int n) {
         String result = "POP3  서버 연결이 되지 않아 메시지를 볼 수 없습니다.";
 
@@ -238,7 +299,17 @@ public class Pop3Agent {
     public void setRequest(HttpServletRequest request) {
         this.request = request;
     }
-    
-    
+    private Connection getConnection() throws SQLException{
+
+        try {
+            Class.forName(JdbcDriver);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return DriverManager.getConnection(JdbcUrl, User, Password);
+
+    }
+
 }  // class Pop3Agent
 

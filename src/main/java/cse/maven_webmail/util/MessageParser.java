@@ -50,7 +50,6 @@ public class MessageParser {
 
     public boolean parse(boolean parseBody) {
         boolean status = false;
-
         try {
             getEnvelope(message);
             if (parseBody) {

@@ -63,7 +63,7 @@
                 <td><input type="text" name="ab_memo" value="<%--<%=ab.getAb_memo() %>--%>" ></td>
             </tr>
             <tr>
-                <td colspan=2 align=center><input type=submit value="저장"><input type=reset href="addrbook_control.jsp?action=list" value="취소"><input type="button" value="삭제" onClick="delcheck()"></td>
+                <td colspan=2 align=center><input type=submit value="저장"><input type=reset value="초기화"><input type="button" value="내용전체삭제" onClick="delcheck()"></td>
             </tr>
         </table>
     </form>

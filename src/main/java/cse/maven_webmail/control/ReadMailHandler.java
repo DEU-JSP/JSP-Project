@@ -39,10 +39,8 @@ public class ReadMailHandler extends HttpServlet {
 
         switch (select) {
             case CommandType.DELETE_MAIL_COMMAND:
-                try (PrintWriter out = response.getWriter()) {
-                    deleteMessage(request);
-                    response.sendRedirect("main_menu.jsp");
-                }
+                deleteMessage(request);
+                response.sendRedirect("main_menu.jsp");
                 break;
 
             case CommandType.DOWNLOAD_COMMAND: // 파일 다운로드 처리
@@ -107,7 +105,7 @@ public class ReadMailHandler extends HttpServlet {
     }
 
     private boolean deleteMessage(HttpServletRequest request) {
-        int msgid = Integer.parseInt((String) request.getParameter("msgid"));
+        int msgid = Integer.parseInt(request.getParameter("msgid"));
 
         HttpSession httpSession = request.getSession();
         String host = (String) httpSession.getAttribute("host");
@@ -115,10 +113,21 @@ public class ReadMailHandler extends HttpServlet {
         String password = (String) httpSession.getAttribute("password");
 
         Pop3Agent pop3 = new Pop3Agent(host, userid, password);
-        boolean status = pop3.deleteMessage(msgid, true);
-        return status;
+        return pop3.deleteMessage(msgid);
     }
 
+
+//    private Connection getConnection() throws SQLException {
+//
+//        try {
+//            Class.forName(JdbcDriver);
+//        } catch (ClassNotFoundException e) {
+//            e.printStackTrace();
+//        }
+//
+//        return DriverManager.getConnection(JdbcUrl, User, Password);
+//
+//    }
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /** 
      * Handles the HTTP <code>GET</code> method.
