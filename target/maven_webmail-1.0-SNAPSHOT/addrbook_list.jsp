@@ -34,9 +34,8 @@
     <HR>
     <form>
         <a href="addrbook_edit_form.jsp">주소록 등록</a><P>
-
         <table border="1">
-            <tr><th>번호</th><th>이 름</th><th>전화번호</th><th>생 일</th><th>회 사</th><th>메 모</th></tr>
+            <tr><th>번호</th><th>사용자 ID</th><th>전화번호</th><th>생 일</th><th>회 사</th><th>메 모</th><th>삭 제</th></tr>
             <%
                 for(AddrBook ab : (ArrayList<AddrBook>)datas) {
             %>
@@ -47,30 +46,13 @@
                 <td><%=ab.getAb_birth() %></td>
                 <td><%=ab.getAb_comdept() %></td>
                 <td><%=ab.getAb_memo() %></td>
+                  <td><form action="addrbook_modify.jsp" method="post">삭제수정할 번호
+                      <input type=text name="<%=ab.getAb_id()%>"><button type = "submit">삭제/수정</button></form></td>>
               </tr>
              <%
                 }
              %>
 
-            <%-- 화면구조확인 위해 --%>
-        <!--
-            <tr>
-                <td>
-                    <%--주소록 번호 클릭시 수정화면으로 이동 / 추후 자바스크립트를 통해 비밀번호 입력 후 컨트롤러로 연결하도록 수정 --%>
-                    <a href="addrbook_edit_form.jsp">1</a></td><td>강호동</td><td>010-123-1234</td><td>1998-10-12</td>
-                <td>동의대학교</td><td>ICT융합대학</td>
-            </tr>
-
-            <tr>
-                <td>2</a></td><td>김영화</td><td>010-3333-3333</td><td>1997-01-13</td>
-                <td>동의대학교</td><td>ICT융합대학</td>
-            </tr>
-
-            <tr>
-                <td>3</a></td><td>전규빈</td><td>010-2222-2222</td><td>1997-09-30</td>
-                <td>동의대학교</td><td>ICT융합대학</td>
-            </tr>
-        -->
         </table>
         <br>
         <a href="main_menu.jsp">이전 메뉴로</a><P>
