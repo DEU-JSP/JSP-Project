@@ -32,13 +32,9 @@ public class JDBCMemberDAO {
         try {
             //로드
             //MySQL
-            var driverName = "com.mysql.jdbc.Driver";
-            Class.forName(driverName);
-
-
             con = getConnection();
 
-        } catch (ClassNotFoundException | SQLException | NamingException e) {
+        } catch (SQLException | NamingException e) {
             LOGGER.error(e.toString());
 
         }
@@ -127,25 +123,26 @@ public class JDBCMemberDAO {
      * member테이블의 모든 레코드 검색(Select)하는 메서드 작성
      * (검색필드와 검색단어가 들어왔을때는 where를 이용하여 검색해준다.)
      **/
+    public ArrayList<MemberVO> getMemberlist(String keyField, String keyWord){
 
-    public List<MemberVO> getMemberlist(String keyWord){
+        ArrayList<MemberVO> list = new ArrayList<MemberVO>();
 
-        List<MemberVO> list = new ArrayList<>();
-        final var sql ="select * from ADDRESSBOOK WHERE \"+keyField.trim()+\" LIKE '%\"+keyWord.trim()+\"%' order by id";
-        final var sql2 = "select * from ADDRESSBOOK WHERE order by id";
+        try{//실행
 
+            String sql ="select * from ADDRESSBOOK ";
 
-        try(var pstmt = con.prepareStatement(sql); var pstmt2 = con.prepareStatement(sql2)){//실행
-            if(keyWord != null && !keyWord.equals("") ) {
-                rs = pstmt.executeQuery();
+            if(keyWord != null && !keyWord.equals("") ){
+                sql +="WHERE "+keyField.trim()+" LIKE '%"+keyWord.trim()+"%' order by id";
+            }else{//모든 레코드 검색
+                sql +="order by id";
             }
-            else {
-                //모든 레코드 검색
-                rs = pstmt2.executeQuery();
-            }
+
+            System.out.println("sql = " + sql);
+            st = con.createStatement();
+            rs = st.executeQuery(sql);
 
             while(rs.next()){
-                var vo = new MemberVO();
+                MemberVO vo = new MemberVO();
 
                 vo.setId(rs.getString(1));
                 vo.setName(rs.getString(2));
@@ -157,13 +154,47 @@ public class JDBCMemberDAO {
                 list.add(vo);
             }
         }catch(Exception e){
-
-            LOGGER.error(e.toString());
+            System.out.println(e+"=> getMemberlist fail");
         }finally{
             dbClose();
         }
         return list;
     }
+//
+//        List<MemberVO> list = new ArrayList<>();
+//        final var sql ="select * from ADDRESSBOOK WHERE "+keyField.trim()+" LIKE '%\"+keyWord.trim()+\"%' order by id";
+//        final var sql2 = "select * from ADDRESSBOOK WHERE order by id";
+//
+//
+//        try(var pstmt = con.prepareStatement(sql); var pstmt2 = con.prepareStatement(sql2)){//실행
+//            if(keyWord != null && !keyWord.equals("") ) {
+//                rs = pstmt.executeQuery();
+//            }
+//            else {
+//                //모든 레코드 검색
+//                rs = pstmt2.executeQuery();
+//            }
+//
+//            while(rs.next()){
+//                var vo = new MemberVO();
+//
+//                vo.setId(rs.getString(1));
+//                vo.setName(rs.getString(2));
+//                vo.setTel(rs.getString(3));
+//                vo.setBirth(rs.getString(4));
+//                vo.setAddr(rs.getString(5));
+//                vo.setMemo(rs.getString(6));
+//
+//                list.add(vo);
+//            }
+//        }catch(Exception e){
+//
+//            LOGGER.error(e.toString());
+//        }finally{
+//            dbClose();
+//        }
+//        return list;
+//    }
 
 
 

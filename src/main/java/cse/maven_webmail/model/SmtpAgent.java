@@ -5,10 +5,9 @@
 package cse.maven_webmail.model;
 
 import com.sun.mail.smtp.SMTPMessage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
+import java.io.InputStream;
+import java.util.Properties;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
@@ -20,21 +19,24 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.internet.MimeUtility;
+import javax.mail.util.ByteArrayDataSource;
 
 /**
  *
  * @author jongmin
  */
-public final class SmtpAgent {
+public class SmtpAgent {
 
-   private String host;
-   private String userid;
-   private String to = null;
-   private String cc = null;
-   private String subj = null;
-   private String body = null;
-   private String file1 = null;
-   private static final Logger LOGGER = LoggerFactory.getLogger(SmtpAgent.class);
+    protected String host = null;
+    protected String userid = null;
+    protected String to = null;
+    protected String cc = null;
+    protected String subj = null;
+    protected String body = null;
+    protected String file1 = null;
+    protected String file2 = null;
+    protected InputStream file = null;
+    protected String date = null;
 
     public SmtpAgent(String host, String userid) {
         this.host = host;
@@ -97,25 +99,43 @@ public final class SmtpAgent {
         this.file1 = file1;
     }
 
+    public String getFile2() {
+        return file2;
+    }
+
+    public void setFile2(String file2) {
+        this.file2 = file2;
+    }
+
+    public InputStream getFile() {
+        return file;
+    }
+
+    public void setFile(InputStream file) {
+        this.file = file;
+    }
+
     // LJM 100418 -  현재 로그인한 사용자의 이메일 주소를 반영하도록 수정되어야 함. - test only
     // LJM 100419 - 일반 웹 서버와의 SMTP 동작시 setFrom() 함수 사용 필요함.
     //              없을 경우 메일 전송이 송신주소가 없어서 걸러짐.
     public boolean sendMessage() {
-        var status = false;
+        boolean status = false;
 
         // 1. property 설정
-        var props = System.getProperties();
+        Properties props = System.getProperties();
         props.put("mail.smtp.host", this.host);
-        LOGGER.info("SMTP host : {} ", props.get("mail.smtp.host"));
+        System.out.println("SMTP host : " + props.get("mail.smtp.host"));
 
         // 2. session 가져오기
-        var session = Session.getDefaultInstance(props, null);
+        Session session = Session.getDefaultInstance(props, null);
         session.setDebug(false);
 
         try {
-            var msg = new SMTPMessage(session);
+            SMTPMessage msg = new SMTPMessage(session);
 
+            // msg.setFrom(new InternetAddress(this.userid + "@" + this.host));
             msg.setFrom(new InternetAddress(this.userid));  // 200102 LJM - 테스트 목적으로 수정
+            //msg.setFrom(new InternetAddress("jongmin@deu.ac.kr"));
 
 
             // setRecipient() can be called repeatedly if ';' or ',' exists
@@ -131,11 +151,12 @@ public final class SmtpAgent {
                 msg.setRecipients(Message.RecipientType.CC, this.cc);
             }
 
+            // msg.setSubject(MimeUtility.encodeText(this.subj, "euc-kr", "B"));
             msg.setSubject(this.subj);
             msg.setHeader("User-Agent", "LJM-WM/0.1");
 
             // body
-            var mbp = new MimeBodyPart();
+            MimeBodyPart mbp = new MimeBodyPart();
             mbp.setText(this.body);
 
             Multipart mp = new MimeMultipart();
@@ -143,11 +164,22 @@ public final class SmtpAgent {
 
             // 첨부 파일 추가
             if (this.file1 != null) {
-                var a1 = new MimeBodyPart();
+                MimeBodyPart a1 = new MimeBodyPart();
                 DataSource src = new FileDataSource(this.file1);
                 a1.setDataHandler(new DataHandler(src));
                 int index = this.file1.lastIndexOf('/');
-                var fileName = this.file1.substring(index + 1);
+                String fileName = this.file1.substring(index + 1);
+                // "B": base64, "Q": quoted-printable
+                a1.setFileName(MimeUtility.encodeText(fileName, "UTF-8", "B"));
+                mp.addBodyPart(a1);
+            }
+            // 예약 메일 전송할때 첨부 파일 추가
+            if (this.file2 != null) {
+                MimeBodyPart a1 = new MimeBodyPart();
+                DataSource src = new ByteArrayDataSource(this.file, "application/octet-stream");
+                a1.setDataHandler(new DataHandler(src));
+                int index = this.file2.lastIndexOf('/');
+                String fileName = this.file2.substring(index + 1);
                 // "B": base64, "Q": quoted-printable
                 a1.setFileName(MimeUtility.encodeText(fileName, "UTF-8", "B"));
                 mp.addBodyPart(a1);
@@ -160,15 +192,16 @@ public final class SmtpAgent {
             // 메일 전송 완료되었으므로 서버에 저장된
             // 첨부 파일 삭제함
             if (this.file1 != null) {
-                var f = new File(this.file1);
+                File f = new File(this.file1);
                 if (!f.delete()) {
-                    LOGGER.error(" {} 파일 삭제가 제대로 안 됨.",this.file1);
+                    System.err.println(this.file1 + " 파일 삭제가 제대로 안 됨.");
                 }
             }
             status = true;
         } catch (Exception ex) {
-            LOGGER.info("sendMessage() error: {}", ex.toString());
+            System.out.println("sendMessage() error: " + ex);
+        } finally {
+            return status;
         }
-        return status;
     }  // sendMessage()
 }

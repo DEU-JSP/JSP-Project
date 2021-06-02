@@ -58,4 +58,19 @@
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
+    <resource-ref>
+        <res-ref-name>jdbc/mysqlWebmail</res-ref-name>
+        <res-type>javax.sql.DataSource</res-type>
+        <res-auth>Container</res-auth>
+        <res-sharing-scope>Shareable</res-sharing-scope>
+    </resource-ref>
+    <servlet>
+        <servlet-name>ReservationHandler</servlet-name>
+        <servlet-class>cse.maven_webmail.control.ReservationHandler</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ReservationHandler</servlet-name>
+        <url-pattern>/ReservationHandler.do</url-pattern>
+    </servlet-mapping>
 </web-app>

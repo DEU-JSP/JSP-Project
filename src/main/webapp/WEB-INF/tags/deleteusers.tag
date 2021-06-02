@@ -15,12 +15,9 @@
 <%@attribute name="schema" required="true"%>
 <%@attribute name="table" required="true"%>
 
-<sql:setDataSource var = "dataSrc"
-                   url="jdbc:mysql://172.20.16.1:3306/${schema}?serverTimezone=Asia/Seoul"
-                   driver="com.mysql.cj.jdbc.Driver"
-                   user="${user}" password="${password}"/>
 
-<sql:query var="rs" dataSource="${dataSrc}">
+
+<sql:query var="rs" dataSource="jdbc/mysqlWebmail">
     SELECT username FROM ${table}
 </sql:query>
 ${empty errorReason ?"<noerror/>" : errorReason}

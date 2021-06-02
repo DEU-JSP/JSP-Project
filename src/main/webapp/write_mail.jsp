@@ -30,20 +30,21 @@
                 <table>
                     <caption></caption>
                     <tr>
-                        <th id="recv_th"></th>
                         <td> 수신 </td>
                         <td> <input type="text" name="to" size="80"
                                     value=<%=request.getParameter("recv") == null ? "" : request.getParameter("recv")%>>  </td>
                     </tr>
                     <tr>
-                        <th id="paste_id"></th>
                         <td>참조</td>
                         <td> <input type="text" name="cc" size="80">  </td>
                     </tr>
                     <tr>
-                        <th id="title_id"></th>
                         <td> 메일 제목 </td>
                         <td> <input type="text" name="subj" size="80"  >  </td>
+                    </tr>
+                    <tr>
+                        <td> 메일 예약 </td>
+                        <td style="text-align: start"> <input type="date" name="subdate" size="80"  >  <input type="time" name="subtime" size="80"  >  </td>
                     </tr>
                     <tr>
                         <td colspan="2">본  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 문</td>
