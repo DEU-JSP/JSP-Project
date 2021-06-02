@@ -12,14 +12,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import cse.maven_webmail.model.UserAdminAgent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 관리자- 사용자 추가/ 사용자- 회원가입
  * @author jongmin
  */
 public class UserAdminHandler extends HttpServlet {
-    private String userId;
-    private String passWord;
+    private static String userId;
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserAdminHandler.class);
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
      * @param request servlet request
@@ -35,12 +37,11 @@ public class UserAdminHandler extends HttpServlet {
 
         HttpSession session = request.getSession();
         userId = (String)session.getAttribute("userid");
-        passWord = (String)session.getAttribute("password");
 
 
         try {
             request.setCharacterEncoding("UTF-8");
-            int select = Integer.parseInt((String) request.getParameter("menu"));
+            var select = Integer.parseInt(request.getParameter("menu"));
 
             switch (select) {
                 case CommandTypeHelper.ADD_USER_COMMAND:
@@ -59,24 +60,21 @@ public class UserAdminHandler extends HttpServlet {
                     break;
             }
         } catch (Exception ex) {
-            out.println(ex.toString());
-        } finally {
-            out.close();
+            LOGGER.info("LOGGER : {}",ex.toString());
         }
+        if(out != null)
+            out.close();
+
     }
 
     private void addUser(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
-        String server = "localhost";
-        int port = 4555;
+        var server = "localhost";
+        var port = 4555;
         try {
-            UserAdminAgent agent = new UserAdminAgent(server, port, this.getServletContext().getRealPath("."));
+            var agent = new UserAdminAgent(server, port, this.getServletContext().getRealPath("."));
             String userid = request.getParameter("id");  // for test
             String password = request.getParameter("password");// for test
-//            out.println("userid = " + userid + "<br>");
-//            out.println("password = " + password + "<br>");
-//            out.flush();
-            // if (addUser successful)  사용자 등록 성공 팝업창
-            // else 사용자 등록 실패 팝업창
+
 
             if (agent.addUser(userid, password)) {
                 if (userId == null || !userId.equals("admin")) {
@@ -96,8 +94,8 @@ public class UserAdminHandler extends HttpServlet {
         }
     }
     private String getUserJoinSuccessPopUp() {
-        String alertMessage = "회원가입을 성공했습니다.";
-        StringBuilder successPopUp = new StringBuilder();
+        var alertMessage = "회원가입을 성공했습니다.";
+        var successPopUp = new StringBuilder();
         successPopUp.append("<html>");
         successPopUp.append("<head>");
 
@@ -117,8 +115,8 @@ public class UserAdminHandler extends HttpServlet {
     }
 
     private String getUserRegistrationSuccessPopUp() {
-        String alertMessage = "사용자 등록이 성공했습니다.";
-        StringBuilder successPopUp = new StringBuilder();
+        var alertMessage = "사용자 등록이 성공했습니다.";
+        var successPopUp = new StringBuilder();
         successPopUp.append("<html>");
         successPopUp.append("<head>");
 
@@ -137,8 +135,8 @@ public class UserAdminHandler extends HttpServlet {
         return successPopUp.toString();
     }
     private String getUserJoinFailurePopUp() {
-        String alertMessage = "회원가입에 실패했습니다.";
-        StringBuilder successPopUp = new StringBuilder();
+        var alertMessage = "회원가입에 실패했습니다.";
+        var successPopUp = new StringBuilder();
         successPopUp.append("<html>");
         successPopUp.append("<head>");
 
@@ -158,8 +156,8 @@ public class UserAdminHandler extends HttpServlet {
     }
 
     private String getUserRegistrationFailurePopUp() {
-        String alertMessage = "사용자 등록이 실패했습니다.";
-        StringBuilder successPopUp = new StringBuilder();
+        var alertMessage = "사용자 등록이 실패했습니다.";
+        var successPopUp = new StringBuilder();
         successPopUp.append("<html>");
         successPopUp.append("<head>");
 
@@ -179,15 +177,15 @@ public class UserAdminHandler extends HttpServlet {
     }
 
     private void deleteUser(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
-        String server = "localhost";
-        int port = 4555;
+        var server = "localhost";
+        var port = 4555;
         try {
-            UserAdminAgent agent = new UserAdminAgent(server, port, this.getServletContext().getRealPath("."));
+            var agent = new UserAdminAgent(server, port, this.getServletContext().getRealPath("."));
             String[] deleteUserList = request.getParameterValues("selectedUsers");
             agent.deleteUsers(deleteUserList);
             response.sendRedirect("admin_menu.jsp");
         } catch (Exception ex) {
-            System.out.println(" UserAdminHandler.deleteUser : exception = " + ex);
+            LOGGER.info(" UserAdminHandler.deleteUser : exception = {}",ex.toString());
         }
     }
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -201,9 +199,13 @@ public class UserAdminHandler extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        processRequest(request, response);
-    }
+            {
+        try {
+            processRequest(request, response);
+        } catch (ServletException | IOException e) {
+            LOGGER.info(e.toString());
+        }
+            }
 
     /**
      * Handles the HTTP <code>POST</code> method.
@@ -214,9 +216,13 @@ public class UserAdminHandler extends HttpServlet {
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        processRequest(request, response);
-    }
+             {
+                 try {
+                     processRequest(request, response);
+                 } catch (ServletException | IOException e) {
+                     LOGGER.info(e.toString());
+                 }
+             }
 
     /**
      * Returns a short description of the servlet.

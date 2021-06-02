@@ -14,6 +14,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import cse.maven_webmail.util.FormParser;
 import cse.maven_webmail.model.SmtpAgent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -27,7 +30,6 @@ import java.sql.SQLException;
  * @author jongmin
  */
 public class WriteMailHandler extends HttpServlet {
-
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
      *
@@ -36,53 +38,43 @@ public class WriteMailHandler extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException      if an I/O error occurs
      */
+    private static final Logger LOGGER = LoggerFactory.getLogger(WriteMailHandler.class);
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+             {
         response.setContentType("text/html;charset=UTF-8");
-//        PrintWriter out = response.getWriter();
         PrintWriter out = null;
 
         try {
             request.setCharacterEncoding("UTF-8");
-            int select = Integer.parseInt((String) request.getParameter("menu"));
+            var select = Integer.parseInt(request.getParameter("menu"));
 
-            switch (select) {
-//                case CommandType.WRITE_MENU:  // 메일 쓰기 화면
-//                    out = response.getWriter();
-//                    response.sendRedirect(homeDirectory + "write_mail.jsp");
-//                    break;
-
-
-                case CommandTypeHelper.SEND_MAIL_COMMAND: // 실제 메일 전송하기
-                    out = response.getWriter();
-                    boolean status = sendMessage(request);
-                    out.print(getMailTransportPopUp(status));
-//                    out.flush();
-                    break;
-
-                default:
-                    out = response.getWriter();
-                    out.println("없는 메뉴를 선택하셨습니다. 어떻게 이 곳에 들어오셨나요?");
-                    break;
+            if (select == CommandTypeHelper.SEND_MAIL_COMMAND) { // 실제 메일 전송하기
+                out = response.getWriter();
+                boolean status = sendMessage(request);
+                out.print(getMailTransportPopUp(status));
+            } else {
+                out = response.getWriter();
+                out.println("없는 메뉴를 선택하셨습니다. 어떻게 이 곳에 들어오셨나요?");
             }
         } catch (Exception ex) {
-            out.println(ex.toString());
-        } finally {
+            LOGGER.info("LOGGER : {}",ex.toString());
+        }
+        if(out != null) {
             out.close();
         }
     }
 
     private boolean sendMessage(HttpServletRequest request) {
-        boolean status = false;
+        var status = false;
         Connection connection = null;
         PreparedStatement pstmt = null;
 
         // 1. toAddress, ccAddress, subject, body, file1 정보를 파싱하여 추출
-        FormParser parser = new FormParser(request);
+        var parser = new FormParser(request);
         parser.parse();
 
         // 2.  request 객체에서 HttpSession 객체 얻기
-        HttpSession session = (HttpSession) request.getSession();
+        HttpSession session = request.getSession();
 
         // 3. HttpSession 객체에서 메일 서버, 메일 사용자 ID 정보 얻기
         String host = (String) session.getAttribute("host");
@@ -93,13 +85,13 @@ public class WriteMailHandler extends HttpServlet {
 
             try {
                 InputStream fileStream = null;
-                int fileLength = 0;
+                var fileLength = 0;
                 //db연결하는 부분
                 connection = getConnection();
                 // sql 문자열 , gb_id 는 자동 등록 되므로 입력하지 않는다.
-                String sql = "insert into booked_mail (host, userid, toAddress, ccAddress, subj, body, fileName, file, bookTime) values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                var sql = "insert into booked_mail (host, userid, toAddress, ccAddress, subj, body, fileName, file, bookTime) values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
                 if(fileName != null){
-                    File file = new File(fileName);
+                    var file = new File(fileName);
                     fileStream = new FileInputStream(file);
                     fileLength = (int) file.length();
                 }
@@ -118,21 +110,17 @@ public class WriteMailHandler extends HttpServlet {
                     status = true;
                     connection.close();
                 }
-            }  catch (SQLException throwables) {
-                throwables.printStackTrace();
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (NamingException e) {
-                e.printStackTrace();
+            }  catch (SQLException | NamingException | FileNotFoundException throwables) {
+                LOGGER.error(throwables.toString());
             }
         } else {    //예약된 메일이 아닐경우
             // 4. SmtpAgent 객체에 메일 관련 정보 설정
-            SmtpAgent agent = new SmtpAgent(host, userid);
+            var agent = new SmtpAgent(host, userid);
             agent.setTo(parser.getToAddress());
             agent.setCc(parser.getCcAddress());
             agent.setSubj(parser.getSubject());
             agent.setBody(parser.getBody());
-            System.out.println("WriteMailHandler.sendMessage() : fileName = " + fileName);
+            LOGGER.info("WriteMailHandler.sendMessage() : fileName = {}", fileName);
             if (fileName != null) {
                 agent.setFile1(fileName);
             }
@@ -154,7 +142,7 @@ public class WriteMailHandler extends HttpServlet {
             alertMessage = "메일 전송이 실패했습니다.";
         }
 
-        StringBuilder successPopUp = new StringBuilder();
+        var successPopUp = new StringBuilder();
         successPopUp.append("<html>");
         successPopUp.append("<head>");
 
@@ -190,7 +178,7 @@ public class WriteMailHandler extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+             {
         processRequest(request, response);
 
 
@@ -206,7 +194,7 @@ public class WriteMailHandler extends HttpServlet {
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+             {
         processRequest(request, response);
 
 

@@ -5,9 +5,11 @@
 package cse.maven_webmail.model;
 
 import com.sun.mail.smtp.SMTPMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.InputStream;
-import java.util.Properties;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
@@ -37,6 +39,7 @@ public class SmtpAgent {
     protected String file2 = null;
     protected InputStream file = null;
     protected String date = null;
+    private static final Logger LOGGER = LoggerFactory.getLogger(SmtpAgent.class);
 
     public SmtpAgent(String host, String userid) {
         this.host = host;
@@ -119,23 +122,21 @@ public class SmtpAgent {
     // LJM 100419 - 일반 웹 서버와의 SMTP 동작시 setFrom() 함수 사용 필요함.
     //              없을 경우 메일 전송이 송신주소가 없어서 걸러짐.
     public boolean sendMessage() {
-        boolean status = false;
+        var status = false;
 
         // 1. property 설정
-        Properties props = System.getProperties();
+        var props = System.getProperties();
         props.put("mail.smtp.host", this.host);
-        System.out.println("SMTP host : " + props.get("mail.smtp.host"));
+        LOGGER.info("SMTP host : {}",props.get("mail.smtp.host"));
 
         // 2. session 가져오기
-        Session session = Session.getDefaultInstance(props, null);
+        var session = Session.getDefaultInstance(props, null);
         session.setDebug(false);
 
         try {
-            SMTPMessage msg = new SMTPMessage(session);
+            var msg = new SMTPMessage(session);
 
-            // msg.setFrom(new InternetAddress(this.userid + "@" + this.host));
             msg.setFrom(new InternetAddress(this.userid));  // 200102 LJM - 테스트 목적으로 수정
-            //msg.setFrom(new InternetAddress("jongmin@deu.ac.kr"));
 
 
             // setRecipient() can be called repeatedly if ';' or ',' exists
@@ -151,12 +152,11 @@ public class SmtpAgent {
                 msg.setRecipients(Message.RecipientType.CC, this.cc);
             }
 
-            // msg.setSubject(MimeUtility.encodeText(this.subj, "euc-kr", "B"));
             msg.setSubject(this.subj);
             msg.setHeader("User-Agent", "LJM-WM/0.1");
 
             // body
-            MimeBodyPart mbp = new MimeBodyPart();
+            var mbp = new MimeBodyPart();
             mbp.setText(this.body);
 
             Multipart mp = new MimeMultipart();
@@ -164,22 +164,22 @@ public class SmtpAgent {
 
             // 첨부 파일 추가
             if (this.file1 != null) {
-                MimeBodyPart a1 = new MimeBodyPart();
+                var a1 = new MimeBodyPart();
                 DataSource src = new FileDataSource(this.file1);
                 a1.setDataHandler(new DataHandler(src));
                 int index = this.file1.lastIndexOf('/');
-                String fileName = this.file1.substring(index + 1);
+                var fileName = this.file1.substring(index + 1);
                 // "B": base64, "Q": quoted-printable
                 a1.setFileName(MimeUtility.encodeText(fileName, "UTF-8", "B"));
                 mp.addBodyPart(a1);
             }
             // 예약 메일 전송할때 첨부 파일 추가
             if (this.file2 != null) {
-                MimeBodyPart a1 = new MimeBodyPart();
+                var a1 = new MimeBodyPart();
                 DataSource src = new ByteArrayDataSource(this.file, "application/octet-stream");
                 a1.setDataHandler(new DataHandler(src));
                 int index = this.file2.lastIndexOf('/');
-                String fileName = this.file2.substring(index + 1);
+                var fileName = this.file2.substring(index + 1);
                 // "B": base64, "Q": quoted-printable
                 a1.setFileName(MimeUtility.encodeText(fileName, "UTF-8", "B"));
                 mp.addBodyPart(a1);
@@ -192,16 +192,15 @@ public class SmtpAgent {
             // 메일 전송 완료되었으므로 서버에 저장된
             // 첨부 파일 삭제함
             if (this.file1 != null) {
-                File f = new File(this.file1);
+                var f = new File(this.file1);
                 if (!f.delete()) {
-                    System.err.println(this.file1 + " 파일 삭제가 제대로 안 됨.");
+                    LOGGER.error("{} 파일 삭제가 제대로 안 됨.",this.file1);
                 }
             }
             status = true;
         } catch (Exception ex) {
-            System.out.println("sendMessage() error: " + ex);
-        } finally {
-            return status;
+            LOGGER.info("sendMessage() error: ", ex);
         }
+            return status;
     }  // sendMessage()
 }
