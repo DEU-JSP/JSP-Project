@@ -1,6 +1,6 @@
 package cse.maven_webmail.control;
 
-public class MemberVO {
+public final class MemberVO {
     /**
      * 필요한 property 선언
      */
@@ -15,7 +15,7 @@ public class MemberVO {
     public MemberVO() {
     }
 
-    public MemberVO(String id, String name, String tel, String birth, String addr, String memo) {
+    public MemberVO(final String id, final String name, final String tel, final String birth, final String addr, final String memo) {
 
         this.id = id;
         this.name = name;

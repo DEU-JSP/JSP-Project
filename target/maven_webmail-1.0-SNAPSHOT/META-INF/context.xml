@@ -1,2 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Context path="/maven_webmail"/>
+<Context path="/maven_webmail">
+    <replace file="META-INF/context.xml" replacefilterfile="system.properties" />
+
+    <Resource name="jdbc/mysqlWebMail" auth="Container"
+          type="javax.sql.DataSource"
+          maxTotal="8" maxIdle="2" maxWaitMillis="5000"
+          username="root" password="1234"
+          driverClassName="com.mysql.cj.jdbc.Driver"
+          url="jdbc:mysql://127.0.0.1:3308/webmail?serverTimezone=Asia/Seoul"/>
+</Context>
+        <!--          username="${database-user}" password="${database-password}"-->
+
+

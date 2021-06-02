@@ -11,7 +11,7 @@
 "http://www.w3.org/TR/html4/loose.dtd">
 <link type="text/css" rel="stylesheet" href="css/main_style.css" />
 
-<html>
+<html lang="ko">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>Insert title here</title>
@@ -29,7 +29,7 @@
 
     <jsp:useBean id="vo" class="cse.maven_webmail.control.MemberVO" />
     <jsp:setProperty property="*" name="vo"/>
-    <jsp:useBean id="dao" class="cse.maven_webmail.control.JDBC_memberDAO"/>
+    <jsp:useBean id="dao" class="cse.maven_webmail.control.JDBCMemberDAO"/>
 
 <%
     if(dao.memberInsert(vo)>0){

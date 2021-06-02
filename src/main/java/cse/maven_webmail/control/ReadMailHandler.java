@@ -9,41 +9,42 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URLEncoder;
-import javax.servlet.ServletException;
+import java.nio.charset.StandardCharsets;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import cse.maven_webmail.model.Pop3Agent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author jongmin
  */
 public class ReadMailHandler extends HttpServlet {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReadMailHandler.class);
 
     /** 
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
      * @param request servlet request
      * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+            throws IOException {
         response.setContentType("text/html;charset=UTF-8");
 
         request.setCharacterEncoding("UTF-8");
-        int select = Integer.parseInt((String) request.getParameter("menu"));
+        var select = Integer.parseInt(request.getParameter("menu"));
 
         switch (select) {
-            case CommandType.DELETE_MAIL_COMMAND:
+            case CommandTypeHelper.DELETE_MAIL_COMMAND:
                 deleteMessage(request);
                 response.sendRedirect("main_menu.jsp");
                 break;
 
-            case CommandType.DOWNLOAD_COMMAND: // 파일 다운로드 처리
+            case CommandTypeHelper.DOWNLOAD_COMMAND: // 파일 다운로드 처리
                 download(request, response);
                 break;
 
@@ -56,104 +57,99 @@ public class ReadMailHandler extends HttpServlet {
         }
     }
 
-    private void download(HttpServletRequest request, HttpServletResponse response) { //throws IOException {
+    private void download(HttpServletRequest request, HttpServletResponse response) {
         response.setContentType("application/octet-stream");
 
-        ServletOutputStream sos = null;
+        ServletOutputStream sos;
 
         try {
-            /* TODO output your page here */
+
             request.setCharacterEncoding("UTF-8");
             // LJM 041203 - 아래와 같이 해서 한글파일명 제대로 인식되는 것 확인했음.
             String fileName = request.getParameter("filename");
-            System.out.println(">>>>>> DOWNLOAD: file name = " + fileName);
 
             String userid = request.getParameter("userid");
-            //String fileName = URLDecoder.decode(request.getParameter("filename"), "utf-8");
 
             // download할 파일 읽기
 
             // 윈도우즈 환경 사용시
-            String downloadDir = "C:/temp/download/";
+            var downloadDir = "C:/temp/download/";
             if (System.getProperty("os.name").equals("Linux")) {
                 downloadDir = request.getServletContext().getRealPath("/WEB-INF") 
                         + File.separator + "download";
-                File f = new File(downloadDir);
+                var f = new File(downloadDir);
                 if (!f.exists()) {
                     f.mkdir();
                 }
             }
 
             response.setHeader("Content-Disposition", "attachment; filename="
-                    + URLEncoder.encode(fileName, "UTF-8") + ";");
+                    + URLEncoder.encode(fileName, StandardCharsets.UTF_8) + ";");
 
-            File f = new File(downloadDir + File.separator + userid + File.separator + fileName);
-            byte[] b = new byte[(int) f.length()];
+            var f = new File(downloadDir + File.separator + userid + File.separator + fileName);
+            var b = new byte[(int) f.length()];
             // try-with-resource 문은 fis를 명시적으로 close해 주지 않아도 됨.
-            try (FileInputStream fis = new FileInputStream(f)) {
-                fis.read(b);
-            };
+            try (var fis = new FileInputStream(f)) {
+                var count = fis.read(b);
+                LOGGER.info("fls.read : {}",count);
+                sos = response.getOutputStream();
+                sos.write(b);
+                sos.flush();
+                sos.close();
+            }
 
             // 다운로드
-            sos = response.getOutputStream();
-            sos.write(b);
-            sos.flush();
-            sos.close();
+
         } catch (Exception ex) {
-            System.out.println("====== DOWNLOAD exception : " + ex);
+            LOGGER.error(ex.toString());
         }
     }
 
-    private boolean deleteMessage(HttpServletRequest request) {
-        int msgid = Integer.parseInt(request.getParameter("msgid"));
+    private void deleteMessage(HttpServletRequest request) {
+        var msgid = Integer.parseInt(request.getParameter("msgid"));
 
-        HttpSession httpSession = request.getSession();
+        var httpSession = request.getSession();
         String host = (String) httpSession.getAttribute("host");
         String userid = (String) httpSession.getAttribute("userid");
         String password = (String) httpSession.getAttribute("password");
 
-        Pop3Agent pop3 = new Pop3Agent(host, userid, password);
-        return pop3.deleteMessage(msgid);
+        var pop3 = new Pop3Agent(host, userid, password);
+        pop3.deleteMessage(msgid);
     }
 
 
-//    private Connection getConnection() throws SQLException {
-//
-//        try {
-//            Class.forName(JdbcDriver);
-//        } catch (ClassNotFoundException e) {
-//            e.printStackTrace();
-//        }
-//
-//        return DriverManager.getConnection(JdbcUrl, User, Password);
-//
-//    }
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /** 
      * Handles the HTTP <code>GET</code> method.
      * @param request servlet request
      * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        processRequest(request, response);
-    }
+             {
+                 try {
+                     processRequest(request, response);
+                 } catch (IOException e) {
+                     LOGGER.error(e.toString());
+                 }
+             }
 
     /** 
      * Handles the HTTP <code>POST</code> method.
      * @param request servlet request
      * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        processRequest(request, response);
-    }
+             {
+                 try {
+                     processRequest(request, response);
+                 } catch (IOException e) {
+                     LOGGER.error(e.toString());
+                 }
+             }
 
     /** 
      * Returns a short description of the servlet.

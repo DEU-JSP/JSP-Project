@@ -4,20 +4,22 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@page import="cse.maven_webmail.control.CommandType" %>
+<%@page import="cse.maven_webmail.control.CommandTypeHelper" %>
 
 <!DOCTYPE html>
 
-<html>
+<html lang="ko">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>메일 쓰기 기본 폼</title>
     </head>
     <body>
         <form enctype="multipart/form-data" method="POST" 
-              action="WriteMail.do?menu=<%= CommandType.SEND_MAIL_COMMAND %>" >
+              action="WriteMail.do?menu=<%= CommandTypeHelper.SEND_MAIL_COMMAND %>" >
             <table>
+                <caption></caption>
                 <tr>
+                    <th id="recv_th"></th>
                     <td> 수신 </td>
                     <td> <input type="text" name="to" size="80"
                                 value=<%=request.getParameter("recv") == null ? "" : request.getParameter("recv")%>>  </td>

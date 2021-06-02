@@ -7,7 +7,7 @@
 
 <!DOCTYPE html PUBLIC
 "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
+<html lang="ko">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>Insert title here</title>
@@ -42,7 +42,7 @@
     2. dao쪽의 select하는 메소드를 호출하여 그 결과를 리턴하여 테이블에 예쁘게 출력한다.
 -->
 
-<jsp:useBean id="dao" class="cse.maven_webmail.control.JDBC_memberDAO" />
+<jsp:useBean id="dao" class="cse.maven_webmail.control.JDBCMemberDAO" />
 <%
 
     request.setCharacterEncoding("UTF-8");
@@ -56,7 +56,8 @@
 <h2>주소록:목록화면</h2>
 
 <table border="1">
-        <th>아이디</th><th>이름</th><th>전화번호</th><th>생일</th><th>주소</th><th>메모</th><th>&nbsp;</th>
+    <caption></caption>
+        <th id="id_th">아이디</th><th id="name_th">이름</th><th id="tel_th">전화번호</th><th id="birth_th">생일</th><th id="addr_id">주소</th><th id="memo_th">메모</th><th id="nbsp_th">&nbsp;</th>
     <%
         for(MemberVO vo : list){
     %>

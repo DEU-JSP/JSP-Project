@@ -4,13 +4,11 @@
  */
 package cse.maven_webmail.util;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import javax.activation.DataHandler;
-import javax.mail.Address;
-import javax.mail.Message;
-import javax.mail.Multipart;
-import javax.mail.Part;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import javax.mail.*;
 import javax.mail.internet.MimeUtility;
 import javax.servlet.http.HttpServletRequest;
 
@@ -18,9 +16,8 @@ import javax.servlet.http.HttpServletRequest;
  *
  * @author jongmin
  */
-public class MessageParser {
-
-    private Message message;
+public final class MessageParser {
+    private final Message message;
     private String toAddress;
     private String fromAddress;
     private String ccAddress;
@@ -29,7 +26,8 @@ public class MessageParser {
     private String body;
     private String fileName;
     private String downloadTempDir = "C:/temp/download/";
-    private String userid;
+    private final String userid;
+    private static final Logger LOGGER = LoggerFactory.getLogger(MessageParser.class);
 
     public MessageParser(Message message, String userid) {
         this.message = message;
@@ -41,32 +39,30 @@ public class MessageParser {
         if (System.getProperty("os.name").equals("Linux")) {
             downloadTempDir = request.getServletContext().getRealPath("/WEB-INF")
                     + File.separator + "download";
-            File f = new File(downloadTempDir);
+            var f = new File(downloadTempDir);
             if (!f.exists()) {
                 f.mkdir();
             }
         }
     }
 
-    public boolean parse(boolean parseBody) {
-        boolean status = false;
+    public void parse(boolean parseBody) {
         try {
-            getEnvelope(message);
+            getEnvelope();
             if (parseBody) {
                 getPart(message);
             }
             printMessage(parseBody);
             //  예외가 발생하지 않았으므로 정상적으로 동작하였음.
-            status = true;
         } catch (Exception ex) {
-            System.out.println("MessageParser.parse() - Exception : " + ex);
-            status = false;
-        } finally {
-            return status;
+
+            LOGGER.info("MessageParser.parse() - Exception :{} ", ex.toString());
+
         }
+
     }
 
-    private void getEnvelope(Message m) throws Exception {
+    private void getEnvelope() throws MessagingException {
         fromAddress = message.getFrom()[0].toString();  // 101122 LJM : replaces getMyFrom2()
         toAddress = getAddresses(message.getRecipients(Message.RecipientType.TO));
         Address[] addr = message.getRecipients(Message.RecipientType.CC);
@@ -81,24 +77,24 @@ public class MessageParser {
     }
 
     // ref: http://www.oracle.com/technetwork/java/faq-135477.html#readattach
-    private void getPart(Part p) throws Exception {
+    private void getPart(Part p) throws MessagingException, IOException {
         String disp = p.getDisposition();
 
         if (disp != null && (disp.equalsIgnoreCase(Part.ATTACHMENT)
                 || disp.equalsIgnoreCase(Part.INLINE))) {  // 첨부 파일
             fileName = MimeUtility.decodeText(p.getFileName());
             if (fileName != null) {
-                System.out.println("MessageParser.getPart() : file = " + fileName);
+                LOGGER.info("MessageParser.getPart() : file = {}", fileName);
                 // 첨부 파일을 서버의 내려받기 임시 저장소에 저장
                 String tempUserDir = this.downloadTempDir + File.separator + this.userid;
-                File dir = new File(tempUserDir);
+                var dir = new File(tempUserDir);
                 if (!dir.exists()) {  // tempUserDir 생성
                     dir.mkdir();
                 }
 
                 String filename = MimeUtility.decodeText(p.getFileName());
-                DataHandler dh = p.getDataHandler();
-                FileOutputStream fos = new FileOutputStream(tempUserDir + File.separator + filename);
+                var dh = p.getDataHandler();
+                var fos = new FileOutputStream(tempUserDir + File.separator + filename);
                 dh.writeTo(fos);
                 fos.flush();
                 fos.close();
@@ -112,7 +108,7 @@ public class MessageParser {
             } else if (p.isMimeType("multipart/alternative")) {
                 // html text보다  plain text 선호
                 Multipart mp = (Multipart) p.getContent();
-                for (int i = 0; i < mp.getCount(); i++) {
+                for (var i = 0; i < mp.getCount(); i++) {
                     Part bp = mp.getBodyPart(i);
                     if (bp.isMimeType("text/plain")) {  // "text/html"도 있을 것임.
                         getPart(bp);
@@ -120,7 +116,7 @@ public class MessageParser {
                 }
             } else if (p.isMimeType("multipart/*")) {
                 Multipart mp = (Multipart) p.getContent();
-                for (int i = 0; i < mp.getCount(); i++) {
+                for (var i = 0; i < mp.getCount(); i++) {
                     getPart(mp.getBodyPart(i));
                 }
             }
@@ -128,23 +124,23 @@ public class MessageParser {
     }
 
     private void printMessage(boolean printBody) {
-        System.out.println("From: " + fromAddress);
-        System.out.println("To: " + toAddress);
-        System.out.println("CC: " + ccAddress);
-        System.out.println("Date: " + sentDate);
-        System.out.println("Subject: " + subject);
+        LOGGER.info("From: {}", fromAddress);
+        LOGGER.info("To: {}", toAddress);
+        LOGGER.info("CC: {}", ccAddress);
+        LOGGER.info("Date: {}", sentDate);
+        LOGGER.info("Subject: {}", subject);
 
         if (printBody) {
-            System.out.println("본 문");
-            System.out.println("---------------------------------");
-            System.out.println(body);
-            System.out.println("---------------------------------");
-            System.out.println("첨부파일: " + fileName);
+            LOGGER.info("본 문");
+            LOGGER.info("---------------------------------");
+            LOGGER.info(body);
+            LOGGER.info("---------------------------------");
+            LOGGER.info("첨부파일: {}", fileName);
         }
     }
 
     private String getAddresses(Address[] addresses) {
-        StringBuilder buffer = new StringBuilder();
+        var buffer = new StringBuilder();
 
         for (Address address : addresses) {
             buffer.append(address.toString());

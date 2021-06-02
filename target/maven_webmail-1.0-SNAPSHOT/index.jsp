@@ -7,7 +7,7 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@page import="cse.maven_webmail.control.CommandType"%>
+<%@page import="cse.maven_webmail.control.CommandTypeHelper"%>
 
 <!DOCTYPE html>
 
@@ -20,7 +20,7 @@
             }
 %>
 
-<html>
+<html lang="ko">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>로그인 화면</title>
@@ -33,7 +33,7 @@
 
 
         <div id="login_form">
-            <form method="POST" action="Login.do?menu=<%= CommandType.LOGIN %>">
+            <form method="POST" action="Login.do?menu=<%= CommandTypeHelper.LOGIN %>">
                 사용자: <input type="text" name="userid" size="20"> <br />
                 암&nbsp;&nbsp;&nbsp;호: <input type="password" name="passwd" size="20"> <br /> <br />
                 <input type="submit" value="로그인" name="B1">&nbsp;&nbsp;&nbsp;

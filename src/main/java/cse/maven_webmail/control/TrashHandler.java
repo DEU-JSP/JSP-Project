@@ -2,6 +2,8 @@ package cse.maven_webmail.control;
 
 
 import cse.maven_webmail.model.TrashAgent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
@@ -17,9 +19,10 @@ import java.nio.charset.StandardCharsets;
  * 휴지통을 구성하는 클래스입니다.
  * @author 강호동
  */
-public class TrashHandler extends HttpServlet {
+public class TrashHandler extends HttpServlet{
     private static final String TEMP_DOWNLOAD_DIR = "C:/temp/upload";
     private static final String MESSAGE_NAME = "messageName";
+    private static final Logger LOGGER = LoggerFactory.getLogger(TrashHandler.class);
 
     /**
      * 요청을 처리합니다.
@@ -30,17 +33,17 @@ public class TrashHandler extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/html;charset=UTF-8");
         request.setCharacterEncoding(StandardCharsets.UTF_8.name());
-        int menu = Integer.parseInt(request.getParameter("menu"));
+        var menu = Integer.parseInt(request.getParameter("menu"));
         switch (menu) {
-            case CommandType.DELETE_MAIL_COMMAND:
+            case CommandTypeHelper.DELETE_MAIL_COMMAND:
                 delete(request, response);
                 //delete
                 break;
-            case CommandType.DOWNLOAD_COMMAND:
+            case CommandTypeHelper.DOWNLOAD_COMMAND:
                 download(request, response);
                 //download
                 break;
-            case CommandType.RESTORE_MAIL_COMMAND:
+            case CommandTypeHelper.RESTORE_MAIL_COMMAND:
                 restore(request, response);
                 //restore
                 break;
@@ -58,21 +61,23 @@ public class TrashHandler extends HttpServlet {
      * @param response 응답
      * @throws IOException PrintWriter로 인해 발생할 수 있습니다.
      */
-    private void download(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    private void download(HttpServletRequest request, HttpServletResponse response) {
         response.setContentType("application/octet-stream");
         String messageName = request.getParameter(MESSAGE_NAME);
-        try (ServletOutputStream sos = response.getOutputStream();
+        try (ServletOutputStream sos = response.getOutputStream()
         ) {
-            TrashAgent trashAgent = new TrashAgent();
+            var trashAgent = new TrashAgent();
             trashAgent.setMessageName(messageName);
             trashAgent.setDir(TEMP_DOWNLOAD_DIR);
             trashAgent.download();
             String fileName = trashAgent.getFileName();
             response.setHeader("Content-Disposition", "attachment; filename="
                     + URLEncoder.encode(fileName, StandardCharsets.UTF_8) + ";");
-            try (FileInputStream fileInputStream = new FileInputStream(TEMP_DOWNLOAD_DIR + "/" + fileName)) {
+            try (var fileInputStream = new FileInputStream(TEMP_DOWNLOAD_DIR + "/" + fileName)) {
                 sos.write(fileInputStream.readAllBytes());
             }
+        } catch (IOException e) {
+            LOGGER.error(e.toString());
         }
     }
 
@@ -82,9 +87,10 @@ public class TrashHandler extends HttpServlet {
      * @param response 응답
      * @throws IOException PrintWriter로 인해 발생할 수 있습니다.
      */
+
     private void delete(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String messageName = request.getParameter(MESSAGE_NAME);
-        TrashAgent trashAgent = new TrashAgent();
+        var trashAgent = new TrashAgent();
         trashAgent.setMessageName(messageName);
         if (trashAgent.delete()) {
             response.sendRedirect("trash.jsp");
@@ -103,7 +109,7 @@ public class TrashHandler extends HttpServlet {
      */
     private void restore(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String messageName = request.getParameter(MESSAGE_NAME);
-        TrashAgent trashAgent = new TrashAgent();
+        var trashAgent = new TrashAgent();
         trashAgent.setMessageName(messageName);
         if (trashAgent.restore()) {
             response.sendRedirect("trash.jsp");
@@ -115,12 +121,20 @@ public class TrashHandler extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        processRequest(req, resp);
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)  {
+        try {
+            processRequest(req, resp);
+        } catch (IOException e) {
+            LOGGER.error(e.toString());
+        }
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        processRequest(req, resp);
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)  {
+        try {
+            processRequest(req, resp);
+        } catch (IOException e) {
+            LOGGER.error(e.toString());
+        }
     }
 }

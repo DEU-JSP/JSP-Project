@@ -4,11 +4,11 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@page import="cse.maven_webmail.control.CommandType" %>
+<%@page import="cse.maven_webmail.control.CommandTypeHelper" %>
 
 <!DOCTYPE html>
 
-<html>
+<html lang="ko">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>웹메일 시스템 메뉴</title>
@@ -23,6 +23,6 @@
         --%>
         <p><a href="add_user.jsp">사용자 추가</a> </p>
         <p><a href="delete_user.jsp"> 사용자 제거</a> </p>
-        <p><a href="Login.do?menu=<%= CommandType.LOGOUT %>">로그아웃</a></p>
+        <p><a href="Login.do?menu=<%= CommandTypeHelper.LOGOUT %>">로그아웃</a></p>
     </body>
 </html>

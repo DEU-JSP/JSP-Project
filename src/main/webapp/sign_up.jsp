@@ -6,10 +6,10 @@
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!--adminhandler 이용하여 회원가입 하기 위하여 추가-->
-<%@page import="cse.maven_webmail.control.CommandType" %>
+<%@page import="cse.maven_webmail.control.CommandTypeHelper" %>
 <!DOCTYPE html>
 
-<html>
+<html lang="ko">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>회원가입</title>
@@ -45,35 +45,40 @@
         <div align="center">
             <br />
             <!-- jsp page로 이동하는 것 대신 UserAdmin.do action 사용하여 회원가입 처리-->
-             <form name="AddUser" action="UserAdmin.do?menu=<%= CommandType.ADD_USER_COMMAND%>"
+             <form name="AddUser" action="UserAdmin.do?menu=<%= CommandTypeHelper.ADD_USER_COMMAND%>"
                   method="POST">
             <table align="center" border="0">
+                <caption></caption>
                 <tr>
+                    <th id="table_th"></th>
                     <td align="center" valign="middle">
                         <table border="1" align="center" width ="600">
-                               
+                            <caption></caption>
                             <tr align="center">
-                                <td colspan="3"><font color="#000000"><b>회원 가입</b></font></td>
+                                <th id="sign_th"></th>
+                                <td colspan="3"><strong>회원 가입</strong></td>
                             </tr>
-
-
                             <tr>
+                                <th id="id_th"></th>
                                 <td width="20%">아이디</td>
                                 <td width="50%"><input name="id" value="" id="id" size="20">
                                  
                             </tr>
 
                             <tr>
+                                <th id="pw_th"></th>
                                 <td>비밀번호</td>
                                 <td><input type="password" name="password"  value="" id="password" onchange="check_pw()"></td>
                             </tr>
 
                             <tr>
+                                <th id="pw_confirm_th"></th>
                                 <td>비밀번호 확인</td>
                                 <td><input type="password" name="password"  value="" id="repwd" onchange="check_pw()">&nbsp;<span id="check"></span></td>
                             </tr>
 
                             <tr><!-- inputCheck() -> script.js 연결해서 여러 오류 검사-->
+                                <th id="signup_th"></th>
                                 <td colspan="3" align="center"><input type="submit"
                                                                       value="회원가입"> &nbsp; &nbsp; <input
                                                                       type="reset" value="다시쓰기"> &nbsp; &nbsp; <input
@@ -83,7 +88,6 @@
                             <tr>
                                 회원가입시 모든 정보란에 입력 바랍니다. <br/>
                                 ※비밀번호 주의사항: 6글자 이상, 20글자 이하<br/>
-                       
                             </tr>
                         </table>
                     </td>

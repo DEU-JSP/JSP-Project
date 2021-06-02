@@ -9,7 +9,6 @@ import org.apache.james.mime4j.stream.MimeConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.blueglacier.email.Attachment;
-import tech.blueglacier.email.Email;
 import tech.blueglacier.parser.CustomContentHandler;
 
 import java.io.IOException;
@@ -20,8 +19,8 @@ import java.util.List;
 /**
  * 휴지통 파일을 포매팅하는 클래스입니다.
  */
-public class TrashMessageFormatter {
-    private static final Logger logger = LoggerFactory.getLogger(TrashMessageFormatter.class);
+public final class TrashMessageFormatter {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TrashMessageFormatter.class);
     private String toAddress;
     private String fromAddress;
     private String subject;
@@ -72,16 +71,16 @@ public class TrashMessageFormatter {
      * 파싱하는 함수입니다.
      */
     public void parse() {
-        CustomContentHandler contentHandler = new CustomContentHandler();
+        var contentHandler = new CustomContentHandler();
 
         MimeConfig mime4jParserConfig = MimeConfig.DEFAULT;
         BodyDescriptorBuilder bodyDescriptorBuilder = new DefaultBodyDescriptorBuilder();
-        MimeStreamParser mime4jParser = new MimeStreamParser(mime4jParserConfig, DecodeMonitor.SILENT, bodyDescriptorBuilder);
+        var mime4jParser = new MimeStreamParser(mime4jParserConfig, DecodeMonitor.SILENT, bodyDescriptorBuilder);
         mime4jParser.setContentDecoding(true);
         mime4jParser.setContentHandler(contentHandler);
         try {
             mime4jParser.parse(mailStream);
-            Email email = contentHandler.getEmail();
+            var email = contentHandler.getEmail();
             toAddress = email.getToEmailHeaderValue();
             cc = email.getCCEmailHeaderValue();
             fromAddress = email.getFromEmailHeaderValue();
@@ -90,14 +89,13 @@ public class TrashMessageFormatter {
             Attachment plainTextEmailBody = email.getPlainTextEmailBody();
             body = new String(plainTextEmailBody.getIs().readAllBytes());
             List<Attachment> attachments = email.getAttachments();
-            if (attachments.size() != 0) {
-                if (attachments.size() == 1) {
+            if (attachments.size() == 1) {
                     fileName = attachments.get(0).getAttachmentName();
                     fileStream = attachments.get(0).getIs();
-                }
+
             }
         } catch (MimeException | IOException e) {
-            logger.error(new Date() + " : " + e.getMessage());
+            LOGGER.error("{} : {}",new Date(), e.getMessage());
         }
     }
 }

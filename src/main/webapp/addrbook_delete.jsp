@@ -11,13 +11,13 @@
 <link type="text/css" rel="stylesheet" href="css/main_style.css" />
 <!DOCTYPE html PUBLIC
 "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
+<html lang="ko">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>Insert title here</title>
 </head>
 <body>
-<jsp:useBean id="dao" class="cse.maven_webmail.control.JDBC_memberDAO" />
+<jsp:useBean id="dao" class="cse.maven_webmail.control.JDBCMemberDAO" />
 
 <%
     //넘어온 ID값 받아서 삭제하는 메소드 호출

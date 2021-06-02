@@ -47,10 +47,9 @@ function getConfirmResult() {
             <td>${row.username}</td>
             <td>
                 <form name="DeleteUser" action="Delete" method="POST";>
-                    <input type-="checkbox" name="username" value="${row.username}" onClick ="return getConfirmResult()" style="visibility: false;" checked="checked"
-                           <input type="submit" value="삭제"></td>
-                </form>
-        </tr>
+                    <input type-="checkbox" name="username" value="${row.username}" onClick ="return getConfirmResult()" style="visibility:hidden;" checked="checked" />
+                    <input type="submit" value="삭제" /></form>
+            </td> </tr>
     </c:forEach>
 </tbody>
 </table>

@@ -1,31 +1,25 @@
 package cse.maven_webmail.model;
 
-import cse.maven_webmail.control.CommandType;
+import cse.maven_webmail.control.CommandTypeHelper;
 import cse.maven_webmail.util.TrashMessageFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.mail.*;
 import javax.naming.NamingException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.util.*;
 
-public class TrashAgent {
-    private static final Logger logger = LoggerFactory.getLogger(TrashAgent.class);
+public final class TrashAgent {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TrashAgent.class);
     private String userId;
     private String messageName;
-    private String result;
     private String dir;
     private String fileName;
-    final String JdbcDriver = "com.mysql.cj.jdbc.Driver";
-    final String JdbcUrl = "jdbc:mysql://localhost:3308/webmail?serverTimezone=Asia/Seoul";
-    final String User = "root";
-    final String Password = "1234";
 
     public TrashAgent() {
         //빈생성자
@@ -44,7 +38,7 @@ public class TrashAgent {
     }
 
     public void setMessageName(String messageName) {
-        logger.info("messageName : {}", messageName);
+        LOGGER.info("messageName : {}", messageName);
         this.messageName = messageName;
     }
 
@@ -53,18 +47,19 @@ public class TrashAgent {
      * @return 휴지통 결과
      */
     public String getResult() {
-        String sql = "SELECT message_body FROM trash WHERE message_name = ?";
-        try (Connection connection = getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        var sql = "SELECT message_body FROM trash WHERE message_name = ?";
+        String result;
+        try (var connection = getConnection();
+             var preparedStatement = connection.prepareStatement(sql)
         ) {
             preparedStatement.setString(1, messageName);
-            logger.info("{}", preparedStatement.toString());
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+            LOGGER.info("{}", preparedStatement);
+            try (var resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    StringBuilder stringBuilder = new StringBuilder();
-                    TrashMessageFormatter trashMessageFormatter = new TrashMessageFormatter();
+                    var stringBuilder = new StringBuilder();
+                    var trashMessageFormatter = new TrashMessageFormatter();
 
-                    try (InputStream inputStream = resultSet.getBinaryStream(1)) {
+                    try (var inputStream = resultSet.getBinaryStream(1)) {
                         trashMessageFormatter.setMailStream(inputStream);
                         trashMessageFormatter.parse();
                     }
@@ -78,7 +73,7 @@ public class TrashAgent {
                     stringBuilder.append("<hr>");
                     if (trashMessageFormatter.getFileName() != null) {
                         stringBuilder.append("<form action=\"trash.do\" method=\"POST\">");
-                        stringBuilder.append("<input type=\"hidden\" name=\"menu\" value=\"").append(CommandType.DOWNLOAD_COMMAND).append("\"/>");
+                        stringBuilder.append("<input type=\"hidden\" name=\"menu\" value=\"").append(CommandTypeHelper.DOWNLOAD_COMMAND).append("\"/>");
                         stringBuilder.append("<input type=\"hidden\" name=\"messageName\" value=\"").append(messageName).append("\"/>");
                         stringBuilder.append("파일 : <input type=\"submit\" value=\"");
                         stringBuilder.append(trashMessageFormatter.getFileName());
@@ -90,8 +85,8 @@ public class TrashAgent {
                     return "데이터베이스 오류가 발생했습니다.";
                 }
             }
-        } catch (SQLException | IOException throwables) {
-            logger.error(throwables.getMessage());
+        } catch (SQLException | IOException | NamingException throwables) {
+            LOGGER.error(throwables.getMessage());
             return "오류가 발생했습니다." + throwables.getMessage();
         }
         return result;
@@ -102,32 +97,34 @@ public class TrashAgent {
      */
     public void download() {
 
-        String sql = "SELECT message_body FROM trash WHERE message_name = ?";
-        try (Connection connection = getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        var sql = "SELECT message_body FROM trash WHERE message_name = ?";
+        try (var connection = getConnection();
+             var preparedStatement = connection.prepareStatement(sql)
         ) {
             preparedStatement.setString(1, messageName);
 
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+            try (var resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    try (InputStream inputStream = resultSet.getBinaryStream(1)) {
-                        TrashMessageFormatter trashMessageFormatter = new TrashMessageFormatter();
+                    try (var inputStream = resultSet.getBinaryStream(1)) {
+                        var trashMessageFormatter = new TrashMessageFormatter();
                         trashMessageFormatter.setMailStream(inputStream);
                         trashMessageFormatter.parse();
                         fileName = trashMessageFormatter.getFileName();
-                        try (InputStream fileStream = trashMessageFormatter.getFileStream();
-                             FileOutputStream fileOutputStream = new FileOutputStream(dir + "/" + fileName);
+                        try (var fileStream = trashMessageFormatter.getFileStream();
+                             var fileOutputStream = new FileOutputStream(dir + "/" + fileName)
                         ) {
                             byte[] decoded = fileStream.readAllBytes();
                             fileOutputStream.write(decoded);
                         }
                     }
                 } else {
-                    logger.error("messageName을 못찾았음 : {}", messageName);
+                    LOGGER.error("messageName을 못찾았음 : {}", messageName);
                 }
             }
         } catch (SQLException | IOException throwables) {
-            logger.error(throwables.getMessage());
+            LOGGER.error(throwables.getMessage());
+        } catch (NamingException e) {
+            LOGGER.error(e.toString());
         }
     }
 
@@ -137,17 +134,17 @@ public class TrashAgent {
      */
     public List<String> getResults() {
         List<String> results = new LinkedList<>();
-        String sql = "SELECT message_name, message_body FROM trash WHERE repository_name = ?";
-        try (Connection connection = getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        var sql = "SELECT message_name, message_body FROM trash WHERE repository_name = ?";
+        try (var connection = getConnection();
+             var preparedStatement = connection.prepareStatement(sql)
         ) {
             preparedStatement.setString(1, userId);
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+            try (var resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
-                    StringBuilder stringBuilder = new StringBuilder();
-                    String messageName = resultSet.getString(1);
-                    TrashMessageFormatter trashMessageFormatter = new TrashMessageFormatter();
-                    try (InputStream inputStream = resultSet.getBinaryStream(2)) {
+                    var stringBuilder = new StringBuilder();
+                    var messageName = resultSet.getString(1);
+                    var trashMessageFormatter = new TrashMessageFormatter();
+                    try (var inputStream = resultSet.getBinaryStream(2)) {
                         trashMessageFormatter.setMailStream(inputStream);
                         trashMessageFormatter.parse();
                     }
@@ -173,7 +170,7 @@ public class TrashAgent {
                     stringBuilder.append("<td>");
                     stringBuilder.append("<form action=\"trash.do\" method=\"POST\">");
                     stringBuilder.append("<input type=\"hidden\" name=\"menu\" value=\"");
-                    stringBuilder.append(CommandType.DELETE_MAIL_COMMAND).append("\"/>");
+                    stringBuilder.append(CommandTypeHelper.DELETE_MAIL_COMMAND).append("\"/>");
                     stringBuilder.append("<input type=\"hidden\" name=\"messageName\" value=\"");
                     stringBuilder.append(messageName).append("\"/>");
                     stringBuilder.append("<input type=\"submit\" class=\"submitLink\" value=\"");
@@ -184,7 +181,7 @@ public class TrashAgent {
                     stringBuilder.append("<td>");
                     stringBuilder.append("<form action=\"trash.do\" method=\"POST\">");
                     stringBuilder.append("<input type=\"hidden\" name=\"menu\" value=\"");
-                    stringBuilder.append(CommandType.RESTORE_MAIL_COMMAND).append("\"/>");
+                    stringBuilder.append(CommandTypeHelper.RESTORE_MAIL_COMMAND).append("\"/>");
                     stringBuilder.append("<input type=\"hidden\" name=\"messageName\" value=\"");
                     stringBuilder.append(messageName).append("\"/>");
                     stringBuilder.append("<input type=\"submit\" class=\"submitLink\" value=\"");
@@ -196,8 +193,8 @@ public class TrashAgent {
                     results.add(stringBuilder.toString());
                 }
             }
-        } catch (SQLException | IOException throwables) {
-            logger.error(throwables.getMessage());
+        } catch (SQLException | IOException | NamingException throwables) {
+            LOGGER.error(throwables.getMessage());
         }
         return results;
     }
@@ -208,16 +205,16 @@ public class TrashAgent {
      */
     public boolean deleteAll() {
         boolean status;
-        String sql = "DELETE FROM trash WHERE repository_name = ?";
-        try (Connection connection = getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        var sql = "DELETE FROM trash WHERE repository_name = ?";
+        try (var connection = getConnection();
+             var preparedStatement = connection.prepareStatement(sql)
         ) {
             preparedStatement.setString(1, userId);
             preparedStatement.executeUpdate();
             status = true;
-        } catch (SQLException throwables) {
+        } catch (SQLException | NamingException throwables) {
             status = false;
-            logger.error(throwables.getMessage());
+            LOGGER.error(throwables.getMessage());
         }
         return status;
     }
@@ -227,12 +224,12 @@ public class TrashAgent {
      * @return 복구 성공 여부
      */
     public boolean restore() {
-        boolean status = false;
-        String firstSql = "INSERT INTO inbox SELECT * FROM trash WHERE message_name= ?";
-        String second = "DELETE FROM trash WHERE message_name = ?";
-        try (Connection connection = getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(firstSql);
-             PreparedStatement secondStatement = connection.prepareStatement(second);
+        var status = false;
+        var firstSql = "INSERT INTO inbox SELECT * FROM trash WHERE message_name= ?";
+        var second = "DELETE FROM trash WHERE message_name = ?";
+        try (var connection = getConnection();
+             var preparedStatement = connection.prepareStatement(firstSql);
+             var secondStatement = connection.prepareStatement(second)
         ) {
             preparedStatement.setString(1, messageName);
             int rows = preparedStatement.executeUpdate();
@@ -241,9 +238,9 @@ public class TrashAgent {
                 int secondRow = secondStatement.executeUpdate();
                 status = secondRow == 1;
             }
-        } catch (SQLException throwables) {
+        } catch (SQLException | NamingException throwables) {
             status = false;
-            logger.error(throwables.getMessage());
+            LOGGER.error(throwables.getMessage());
         }
         return status;
     }
@@ -254,30 +251,25 @@ public class TrashAgent {
      */
     public boolean delete() {
         boolean status;
-        String sql = "DELETE FROM trash WHERE message_name = ?";
-        try (Connection connection = getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        var sql = "DELETE FROM trash WHERE message_name = ?";
+        try (var connection = getConnection();
+             var preparedStatement = connection.prepareStatement(sql)
         ) {
             preparedStatement.setString(1, messageName);
             int rows = preparedStatement.executeUpdate();
             status = rows == 1;
-        } catch (SQLException throwables) {
+        } catch (SQLException | NamingException throwables) {
             status = false;
-            logger.error(throwables.getMessage());
+            LOGGER.error(throwables.getMessage());
         }
         return status;
     }
 
-    private Connection getConnection() throws SQLException{
-
-            try {
-                Class.forName(JdbcDriver);
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-
-        return DriverManager.getConnection(JdbcUrl, User, Password);
-
+    private Connection getConnection() throws NamingException, SQLException {
+        var name = "java:/comp/env/jdbc/mysqlWebmail";
+        var context = new javax.naming.InitialContext();
+        var dataSource = (javax.sql.DataSource) context.lookup(name);
+        return dataSource.getConnection();
     }
 
 }
